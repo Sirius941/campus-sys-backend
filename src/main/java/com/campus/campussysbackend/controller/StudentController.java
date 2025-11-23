@@ -24,8 +24,7 @@ public class StudentController {
     private IStudentService studentService;
 
     /**
-     * 1. 新增学员 [cite: 62]
-     * 自动创建关联账号，状态默认为未审核
+     * 1. 新增学员
      */
     @PostMapping("/add")
     public Result<Boolean> addStudent(@RequestBody Student student) {
@@ -41,8 +40,7 @@ public class StudentController {
     }
 
     /**
-     * 2. 学员查询 [cite: 61]
-     * 支持按姓名模糊查询
+     * 2. 学员查询
      */
     @GetMapping("/list")
     public Result<List<Student>> listStudents(@RequestParam(required = false) String name) {
@@ -50,14 +48,12 @@ public class StudentController {
         if (StringUtils.hasText(name)) {
             wrapper.like(Student::getStuName, name);
         }
-        // 按 ID 降序
         wrapper.orderByDesc(Student::getId);
         return Result.success(studentService.list(wrapper));
     }
 
     /**
-     * 3. 审核学员 [cite: 64]
-     * 将关联账号状态改为正常
+     * 3. 审核学员
      */
     @PutMapping("/audit/{id}")
     public Result<Boolean> auditStudent(@PathVariable Integer id) {
@@ -69,22 +65,10 @@ public class StudentController {
         }
     }
 
+    // 【删除】这里原来有一个占位符的 importStudents() 方法，必须删掉！
+
     /**
-     * 4. 批量导入学员 (Excel导入) [cite: 63]
-     * 这是一个接口定义的占位符。
-     * 真正实现需要引入 EasyExcel 或 POI 依赖来解析文件。
-     */
-    @PostMapping("/import")
-    public Result<String> importStudents() {
-        // TODO: 1. 接收 MultipartFile file
-        // TODO: 2. 使用 EasyExcel 读取数据
-        // TODO: 3. 循环调用 studentService.addStudentWithUser(student)
-        return Result.success("导入功能需引入Excel依赖库实现，接口已预留");
-    }
-    /**
-     * 5. 批量审核学员 [cite: 65]
-     * 接口地址：PUT /student/audit/batch
-     * 请求体：[1, 2, 3, 4]  (JSON 数组)
+     * 5. 批量审核学员
      */
     @PutMapping("/audit/batch")
     public Result<Boolean> auditStudentsBatch(@RequestBody List<Integer> studentIds) {
