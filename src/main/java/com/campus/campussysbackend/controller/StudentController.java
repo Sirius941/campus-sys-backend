@@ -10,6 +10,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+import com.alibaba.excel.EasyExcel;
+import com.campus.campussysbackend.common.StudentImportListener;
+import com.campus.campussysbackend.entity.StudentImportVO;
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/student")
 public class StudentController {
@@ -90,6 +96,29 @@ public class StudentController {
             return Result.success(true);
         } catch (RuntimeException e) {
             return Result.error("批量审核失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 6. 批量导入学员 (Excel导入)
+     * 实现逻辑：接收文件 -> 解析 Excel -> 循环入库
+     */
+    @PostMapping("/import")
+    public Result<String> importStudents(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return Result.error("文件不能为空");
+        }
+
+        try {
+            // 使用 EasyExcel 读取
+            EasyExcel.read(file.getInputStream(), StudentImportVO.class, new StudentImportListener(studentService))
+                    .sheet()
+                    .doRead();
+
+            return Result.success("导入成功（部分失败请查看后台日志）");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Result.error("导入失败：" + e.getMessage());
         }
     }
 }
