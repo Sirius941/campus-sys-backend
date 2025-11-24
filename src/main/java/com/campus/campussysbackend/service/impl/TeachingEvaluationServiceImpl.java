@@ -6,12 +6,15 @@ import com.campus.campussysbackend.entity.TeachingEvaluation;
 import com.campus.campussysbackend.mapper.TeachingEvaluationMapper;
 import com.campus.campussysbackend.service.ITeachingEvaluationService;
 import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Autowired; // 新增
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class TeachingEvaluationServiceImpl extends ServiceImpl<TeachingEvaluationMapper, TeachingEvaluation> implements ITeachingEvaluationService {
+
+    @Autowired
+    private TeachingEvaluationMapper evaluationMapper; // 新增：便于测试
 
     @Override
     public boolean addEvaluation(TeachingEvaluation evaluation) {
@@ -29,7 +32,7 @@ public class TeachingEvaluationServiceImpl extends ServiceImpl<TeachingEvaluatio
         //      .eq(TeachingEvaluation::getCourseId, evaluation.getCourseId());
         // if (this.count(query) > 0) { throw new RuntimeException("该学生已评价，请勿重复提交"); }
 
-        return this.save(evaluation);
+        return evaluationMapper.insert(evaluation) == 1;
     }
 
     @Override
@@ -37,6 +40,6 @@ public class TeachingEvaluationServiceImpl extends ServiceImpl<TeachingEvaluatio
         LambdaQueryWrapper<TeachingEvaluation> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(TeachingEvaluation::getCourseId, courseId);
         wrapper.orderByDesc(TeachingEvaluation::getEvaulatedTime);
-        return this.list(wrapper);
+        return evaluationMapper.selectList(wrapper);
     }
 }

@@ -16,6 +16,9 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     @Autowired
     private SysUserMapper sysUserMapper; // 需要操作用户表
 
+    @Autowired
+    private TeacherMapper teacherMapper; // 新增：直接注入，便于 Mockito 测试
+
     @Override
     @Transactional(rollbackFor = Exception.class) // 开启事务：如果任何一步失败，全部回滚
     public void addTeacherWithUser(Teacher teacher) {
@@ -29,14 +32,13 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
         newUser.setStatus("1"); // 1表示正常 [cite: 78]
         newUser.setGender("M"); // 默认为M，或者前端传
 
-        // 2. 插入用户 (MyBatis-Plus 插入后会自动将 ID 回填到 newUser 对象中)
+        // 2. 插入用户（获取回填 ID）
         sysUserMapper.insert(newUser);
 
-        // 3. 关联教师与用户
-        // 将刚刚生成的 User ID 赋给 Teacher 的 login_id 字段 [cite: 78]
+        // 3. 关联 teacher 与 user（loginId）
         teacher.setLoginId(newUser.getId());
 
-        // 4. 插入教师
-        this.save(teacher);
+        // 4. 插入 teacher（使用直接注入的 mapper）
+        teacherMapper.insert(teacher);
     }
 }

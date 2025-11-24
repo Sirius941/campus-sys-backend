@@ -17,6 +17,9 @@ public class TeachingClassServiceImpl extends ServiceImpl<TeachingClassMapper, T
     @Autowired
     private CampusActivityMapper activityMapper;
 
+    @Autowired
+    private TeachingClassMapper teachingClassMapper; // 新增：直接注入自身 mapper 便于 Mockito 测试
+
     @Override
     public boolean createClass(TeachingClass teachingClass) {
         // 1. 校验必填项
@@ -40,6 +43,6 @@ public class TeachingClassServiceImpl extends ServiceImpl<TeachingClassMapper, T
         teachingClass.setCreatedTime(LocalDateTime.now());
 
         // 5. 保存
-        return this.save(teachingClass);
+        return teachingClassMapper.insert(teachingClass) == 1;
     }
 }

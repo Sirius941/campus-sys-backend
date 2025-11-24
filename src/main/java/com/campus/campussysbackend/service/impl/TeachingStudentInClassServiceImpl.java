@@ -7,11 +7,14 @@ import com.campus.campussysbackend.mapper.TeachingStudentInClassMapper;
 import com.campus.campussysbackend.service.ITeachingStudentInClassService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.beans.factory.annotation.Autowired; // 新增
 import java.util.List;
 
 @Service
 public class TeachingStudentInClassServiceImpl extends ServiceImpl<TeachingStudentInClassMapper, TeachingStudentInClass> implements ITeachingStudentInClassService {
+
+    @Autowired
+    private TeachingStudentInClassMapper teachingStudentInClassMapper; // 新增：便于测试
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -26,7 +29,8 @@ public class TeachingStudentInClassServiceImpl extends ServiceImpl<TeachingStude
             wrapper.eq(TeachingStudentInClass::getClassId, classId);
             wrapper.eq(TeachingStudentInClass::getStudentId, studentId);
 
-            if (this.count(wrapper) > 0) {
+            Long count = teachingStudentInClassMapper.selectCount(wrapper);
+            if (count != null && count > 0) {
                 // 如果已存在，可以选择跳过或报错。这里选择跳过，继续处理下一个。
                 continue;
             }
@@ -37,7 +41,7 @@ public class TeachingStudentInClassServiceImpl extends ServiceImpl<TeachingStude
             relation.setStudentId(studentId);
             // groupId 默认为空，由教辅后续分配
 
-            this.save(relation);
+            teachingStudentInClassMapper.insert(relation);
         }
     }
 }

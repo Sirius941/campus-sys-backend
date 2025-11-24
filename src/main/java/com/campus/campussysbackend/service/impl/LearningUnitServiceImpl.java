@@ -6,13 +6,20 @@ import com.campus.campussysbackend.entity.LearningUnit;
 import com.campus.campussysbackend.mapper.LearningUnitMapper;
 import com.campus.campussysbackend.service.ILearningUnitService;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @Service
 public class LearningUnitServiceImpl extends ServiceImpl<LearningUnitMapper, LearningUnit> implements ILearningUnitService {
 
+    @Autowired
+    private LearningUnitMapper learningUnitMapper;
+
     @Override
     public List<LearningUnit> getUnitsByCourseId(Integer courseId) {
+        if (courseId == null) {
+            throw new IllegalArgumentException("courseId 不能为空");
+        }
         LambdaQueryWrapper<LearningUnit> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(LearningUnit::getCourseId, courseId);
 
@@ -20,6 +27,7 @@ public class LearningUnitServiceImpl extends ServiceImpl<LearningUnitMapper, Lea
         // 实际项目中可能需要更复杂的树形结构组装，这里先返回列表
         wrapper.orderByAsc(LearningUnit::getId);
 
-        return this.list(wrapper);
+        // 使用直接注入的 mapper，避免在单元测试中 baseMapper 为空导致 this.list(wrapper) 抛异常
+        return learningUnitMapper.selectList(wrapper);
     }
 }
