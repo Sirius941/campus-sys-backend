@@ -12,12 +12,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -34,9 +34,11 @@ class StudentServiceImplTest {
     private StudentServiceImpl studentService;
 
     @BeforeEach
-    void setUp() {
-        // 不再需要反射注入 baseMapper，因为 StudentServiceImpl 直接使用 getBaseMapper().insert/selectById，
-        // 在测试中这些调用会走到 mock 的 studentMapper。
+    void setUp() throws Exception {
+        // 手动将 mock 的 studentMapper 注入到 ServiceImpl 的 baseMapper 字段，避免 MyBatis-Plus 抛 baseMapper can not be null
+        Field baseMapperField = StudentServiceImpl.class.getSuperclass().getDeclaredField("baseMapper");
+        baseMapperField.setAccessible(true);
+        baseMapperField.set(studentService, studentMapper);
     }
 
     @Test

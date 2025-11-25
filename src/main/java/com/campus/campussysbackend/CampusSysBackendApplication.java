@@ -1,11 +1,12 @@
-package com.campus.campussysbackend; // 保持你的包名不变
+package com.campus.campussysbackend;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration; // 引入这个包
 
-@SpringBootApplication
-// 【关键修改】这里要改成你的实际包路径 + .mapper
+// 【关键修改】 exclude = {SecurityAutoConfiguration.class}
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @MapperScan("com.campus.campussysbackend.mapper")
 public class CampusSysBackendApplication {
 

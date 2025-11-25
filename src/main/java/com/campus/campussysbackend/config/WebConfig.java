@@ -17,13 +17,12 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**") // 拦截所有接口
                 .excludePathPatterns(
-                        "/user/login",      // 排除登录接口 [cite: 67]
-                        "/user/add",        // 排除注册(新增用户)接口
-                        "/student/add",     // 如果允许未登录报名，需排除；否则需登录后录入
-                        "/doc.html",        // 排除 Swagger/Knife4j 文档资源
-                        "/webjars/**",
-                        "/swagger-resources/**",
-                        "/v3/api-docs/**"
+                        "/user/login",      // 登录接口
+                        "/user/add",        // 注册接口
+                        "/doc.html",        // Knife4j 主页
+                        "/webjars/**",      // 静态资源
+                        "/v3/api-docs/**",  // OpenAPI 描述 json
+                        "/favicon.ico"      // 图标
                 );
     }
 }
