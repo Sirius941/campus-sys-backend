@@ -3,10 +3,13 @@ package com.campus.campussysbackend.controller;
 import com.campus.campussysbackend.common.Result;
 import com.campus.campussysbackend.entity.LearningUnit;
 import com.campus.campussysbackend.service.ILearningUnitService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+@Tag(name = "学习单元管理")
 @RestController
 @RequestMapping("/learning-unit")
 public class LearningUnitController {
@@ -18,6 +21,7 @@ public class LearningUnitController {
      * b) 学习单元创建 [cite: 56]
      * 注意：如果是创建“小节”，前端需要传 fatherId；如果是“章”，fatherId 为空或0
      */
+    @Operation(summary = "学习单元创建")
     @PostMapping("/create")
     public Result<Boolean> createUnit(@RequestBody LearningUnit unit) {
         // 简单校验
@@ -31,6 +35,7 @@ public class LearningUnitController {
     /**
      * b) 学习单元查询: 根据课程id,来查询对应的学习单元列表 [cite: 57, 58]
      */
+    @Operation(summary = "根据课程ID查询学习单元列表")
     @GetMapping("/list/{courseId}")
     public Result<List<LearningUnit>> listUnitsByCourse(@PathVariable Integer courseId) {
         List<LearningUnit> list = learningUnitService.getUnitsByCourseId(courseId);

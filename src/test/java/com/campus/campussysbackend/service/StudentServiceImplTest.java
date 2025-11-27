@@ -12,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -34,11 +33,9 @@ class StudentServiceImplTest {
     private StudentServiceImpl studentService;
 
     @BeforeEach
-    void setUp() throws Exception {
-        // 手动将 mock 的 studentMapper 注入到 ServiceImpl 的 baseMapper 字段，避免 MyBatis-Plus 抛 baseMapper can not be null
-        Field baseMapperField = StudentServiceImpl.class.getSuperclass().getDeclaredField("baseMapper");
-        baseMapperField.setAccessible(true);
-        baseMapperField.set(studentService, studentMapper);
+    void setUp() {
+        // 不再通过反射设置 baseMapper，StudentServiceImpl 已直接注入 StudentMapper
+        // @InjectMocks 会把上面的 @Mock 注入到 studentService 对应字段
     }
 
     @Test
@@ -92,14 +89,31 @@ class StudentServiceImplTest {
 
     @Test
     void auditStudentsBatch_shouldLoopOverIds() {
-        // 为了触发内部逻辑并避免不必要 stubbing，这里让 selectById 返回一个存在的 Student，
-        // 然后在 auditStudent 中因为找不到 SysUser 抛异常。
-        Student student = new Student();
-        student.setId(1);
-        student.setLoginId(10);
-        when(studentMapper.selectById(anyInt())).thenReturn(student);
-        when(sysUserMapper.selectById(10)).thenReturn(null);
+        // 让 selectById 根据不同 id 返回不同结果，避免不必要的 stubbing
+        Student s1 = new Student();
+        s1.setId(1);
+        s1.setLoginId(10);
+        Student s2 = new Student();
+        s2.setId(2);
+        s2.setLoginId(20);
+        when(studentMapper.selectById(1)).thenReturn(s1);
+        when(studentMapper.selectById(2)).thenReturn(s2);
 
-        assertThrows(RuntimeException.class, () -> studentService.auditStudentsBatch(Arrays.asList(1, 2)));
+        SysUser u1 = new SysUser();
+        u1.setId(10);
+        u1.setStatus("2");
+        SysUser u2 = new SysUser();
+        u2.setId(20);
+        u2.setStatus("2");
+        when(sysUserMapper.selectById(10)).thenReturn(u1);
+        when(sysUserMapper.selectById(20)).thenReturn(u2);
+
+        studentService.auditStudentsBatch(Arrays.asList(1, 2));
+
+        // 两个用户都应被更新为正常状态
+        assertEquals("1", u1.getStatus());
+        assertEquals("1", u2.getStatus());
+        verify(sysUserMapper, times(1)).updateById(u1);
+        verify(sysUserMapper, times(1)).updateById(u2);
     }
 }

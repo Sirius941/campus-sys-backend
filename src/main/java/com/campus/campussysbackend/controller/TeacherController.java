@@ -4,12 +4,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.campus.campussysbackend.common.Result;
 import com.campus.campussysbackend.entity.Teacher;
 import com.campus.campussysbackend.service.ITeacherService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "教师管理")
 @RestController
 @RequestMapping("/teacher")
 public class TeacherController {
@@ -17,11 +20,13 @@ public class TeacherController {
     @Autowired
     private ITeacherService teacherService;
 
+
     /**
      * 1. 新增教师
      * 文档要求 [cite: 17, 51]：添加教师时，自动添加对应的用户记录。
      * 注意：这里调用的是我们在 Service 层专门写的事务方法 addTeacherWithUser。
      */
+    @Operation(summary = "新增教师")
     @PostMapping("/add")
     public Result<Boolean> addTeacher(@RequestBody Teacher teacher) {
         // 简单校验：教师姓名不能为空
@@ -43,6 +48,7 @@ public class TeacherController {
      * 2. 根据ID查询教师
      * 文档要求 ：根据id查询教师信息
      */
+    @Operation(summary = "根据ID查询教师")
     @GetMapping("/{id}")
     public Result<Teacher> getTeacherById(@PathVariable Integer id) {
         Teacher teacher = teacherService.getById(id);
@@ -57,6 +63,7 @@ public class TeacherController {
      * 文档要求 ：根据教师筛选条件查询教师
      * 支持条件：姓名(模糊)、学校(精确)、学科(精确)
      */
+    @Operation(summary = "教师列表查询（支持筛选）")
     @GetMapping("/list")
     public Result<List<Teacher>> listTeachers(
             @RequestParam(required = false) String name,

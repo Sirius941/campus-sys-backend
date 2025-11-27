@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.campus.campussysbackend.common.Result;
 import com.campus.campussysbackend.entity.SysUser;
 import com.campus.campussysbackend.service.ISysUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@Tag(name = "用户管理")
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -22,6 +25,7 @@ public class UserController {
      * a) 用户登录 [cite: 67]
      * 需求：登录成功，获得请求Token [cite: 68]
      */
+    @Operation(summary = "用户登录，成功返回Token")
     @PostMapping("/login")
     // 这里使用 Map 接收参数，也可以直接用 SysUser 对象接收
     public Result<String> login(@RequestBody Map<String, String> loginParams) {
@@ -46,6 +50,7 @@ public class UserController {
      * 注意：这里通常指新增管理员或其他非关联角色。
      * 教师和学员通常通过各自的业务接口（addTeacher/addStudent）自动新增用户。
      */
+    @Operation(summary = "新增用户")
     @PostMapping("/add")
     public Result<Boolean> addUser(@RequestBody SysUser user) {
         // 1. 简单校验
@@ -74,6 +79,7 @@ public class UserController {
     /**
      * c) 用户查询：按照名字或id查询
      */
+    @Operation(summary = "用户查询，支持按名字（模糊）或ID（精确）查询")
     @GetMapping("/list")
     public Result<List<SysUser>> listUsers(@RequestParam(required = false) String name,
                                            @RequestParam(required = false) Integer id) {

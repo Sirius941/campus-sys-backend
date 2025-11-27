@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.campus.campussysbackend.common.Result;
 import com.campus.campussysbackend.entity.Student;
 import com.campus.campussysbackend.service.IStudentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import com.campus.campussysbackend.common.StudentImportListener;
 import com.campus.campussysbackend.entity.StudentImportVO;
 import java.io.IOException;
 
+@Tag(name = "学员管理")
 @RestController
 @RequestMapping("/student")
 public class StudentController {
@@ -26,6 +29,7 @@ public class StudentController {
     /**
      * 1. 新增学员
      */
+    @Operation(summary = "新增学员")
     @PostMapping("/add")
     public Result<Boolean> addStudent(@RequestBody Student student) {
         if (!StringUtils.hasText(student.getParentPhone())) {
@@ -42,6 +46,7 @@ public class StudentController {
     /**
      * 2. 学员查询
      */
+    @Operation(summary = "学员查询")
     @GetMapping("/list")
     public Result<List<Student>> listStudents(@RequestParam(required = false) String name) {
         LambdaQueryWrapper<Student> wrapper = new LambdaQueryWrapper<>();
@@ -55,6 +60,7 @@ public class StudentController {
     /**
      * 3. 审核学员
      */
+    @Operation(summary = "审核学员")
     @PutMapping("/audit/{id}")
     public Result<Boolean> auditStudent(@PathVariable Integer id) {
         try {
@@ -70,6 +76,7 @@ public class StudentController {
     /**
      * 5. 批量审核学员
      */
+    @Operation(summary = "批量审核学员")
     @PutMapping("/audit/batch")
     public Result<Boolean> auditStudentsBatch(@RequestBody List<Integer> studentIds) {
         if (studentIds == null || studentIds.isEmpty()) {
@@ -87,6 +94,7 @@ public class StudentController {
      * 6. 批量导入学员 (Excel导入)
      * 实现逻辑：接收文件 -> 解析 Excel -> 循环入库
      */
+    @Operation(summary = "批量导入学员（Excel）")
     @PostMapping("/import")
     public Result<String> importStudents(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {

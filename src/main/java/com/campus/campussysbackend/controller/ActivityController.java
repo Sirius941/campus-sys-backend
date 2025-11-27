@@ -1,9 +1,12 @@
 package com.campus.campussysbackend.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.campus.campussysbackend.common.RequireRole;
 import com.campus.campussysbackend.common.Result;
 import com.campus.campussysbackend.entity.CampusActivity;
 import com.campus.campussysbackend.service.ICampusActivityService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils; // 引入工具类
 import org.springframework.web.bind.annotation.*;
@@ -11,13 +14,16 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Tag(name = "活动管理")
 @RestController
 @RequestMapping("/activity")
+@RequireRole("admin") // 仅管理员可操作活动管理
 public class ActivityController {
 
     @Autowired
     private ICampusActivityService activityService;
 
+    @Operation(summary = "创建活动")
     // 1. 活动创建
     @PostMapping("/create")
     public Result<Boolean> createActivity(@RequestBody CampusActivity activity) {
@@ -36,6 +42,7 @@ public class ActivityController {
         return Result.success(saved);
     }
 
+    @Operation(summary = "修改活动")
     // 2. 活动修改 [cite: 41]
     @PutMapping("/update")
     public Result<Boolean> updateActivity(@RequestBody CampusActivity activity) {
@@ -43,12 +50,14 @@ public class ActivityController {
         return Result.success(activityService.updateById(activity));
     }
 
+    @Operation(summary = "发布活动")
     // 3. 活动发布
     @PutMapping("/publish/{id}")
     public Result<Boolean> publishActivity(@PathVariable Integer id) {
         return Result.success(activityService.publishActivity(id));
     }
 
+    @Operation(summary = "查询活动列表")
     // 4. 活动查询
     @GetMapping("/list")
     public Result<List<CampusActivity>> listActivities(@RequestParam(required = false) String name,

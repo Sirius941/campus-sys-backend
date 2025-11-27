@@ -5,6 +5,8 @@ import com.campus.campussysbackend.common.Result;
 import com.campus.campussysbackend.entity.TeachingClass;
 import com.campus.campussysbackend.entity.TeachingStudentInClass;
 import com.campus.campussysbackend.service.ITeachingClassService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,7 @@ import java.util.List;
 import com.campus.campussysbackend.service.ITeachingStudentInClassService;
 import java.util.Map;
 
+@Tag(name = "教学班管理")
 @RestController
 @RequestMapping("/class")
 public class ClassController {
@@ -24,6 +27,7 @@ public class ClassController {
      * 1. 教学班创建
      * 文档要求：对每个活动，可创建一个或多个教学班，必须关联已发布的活动 [cite: 46]
      */
+    @Operation(summary = "教学班创建")
     @PostMapping("/create")
     public Result<Boolean> createClass(@RequestBody TeachingClass teachingClass) {
         try {
@@ -35,6 +39,7 @@ public class ClassController {
         }
     }
 
+    @Operation(summary = "教学班修改")
     /**
      * 2. 教学班修改
      * [cite: 47]
@@ -49,6 +54,7 @@ public class ClassController {
      * 文档要求：针对创建的教学班，可以配置对应的教师 [cite: 49]
      * 实现：本质上就是更新 teacherId 字段
      */
+    @Operation(summary = "配置教师")
     @PutMapping("/assign-teacher")
     public Result<Boolean> assignTeacher(@RequestParam Integer classId,
                                          @RequestParam Integer teacherId) {
@@ -62,6 +68,7 @@ public class ClassController {
      * 4. 教学班查询
      * 通常需要支持：按活动ID查（看这个活动下有哪些班）、按班级名查
      */
+    @Operation(summary = "教学班查询")
     @GetMapping("/list")
     public Result<List<TeachingClass>> listClasses(
             @RequestParam(required = false) Integer activityId,
@@ -88,10 +95,12 @@ public class ClassController {
     /**
      * 5. 根据ID获取班级详情
      */
+    @Operation(summary = "根据ID获取班级详情")
     @GetMapping("/{id}")
     public Result<TeachingClass> getClassById(@PathVariable Integer id) {
         return Result.success(classService.getById(id));
     }
+
     @Autowired
     private ITeachingStudentInClassService classStudentService; // 注入新的 Service
 
@@ -104,6 +113,7 @@ public class ClassController {
      * "studentIds": [1, 2, 3, 5]
      * }
      */
+    @Operation(summary = "关联学员到教学班")
     @PostMapping("/add-students")
     public Result<Boolean> addStudentsToClass(@RequestBody Map<String, Object> params) {
         try {

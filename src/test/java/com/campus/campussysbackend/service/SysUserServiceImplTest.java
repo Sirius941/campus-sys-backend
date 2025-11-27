@@ -48,7 +48,8 @@ class SysUserServiceImplTest {
         assertNotNull(token);
         assertEquals(32, token.length());
         ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
-        verify(valueOperations, times(1)).set(keyCaptor.capture(), eq("100"), eq(30L), eq(java.util.concurrent.TimeUnit.MINUTES));
+        // 期望存入的值为 "id:loginName"
+        verify(valueOperations, times(1)).set(keyCaptor.capture(), eq("100:admin"), eq(30L), eq(java.util.concurrent.TimeUnit.MINUTES));
         assertTrue(keyCaptor.getValue().startsWith("login:token:"));
     }
 
